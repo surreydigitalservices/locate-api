@@ -14,6 +14,7 @@ import uk.gov.gds.locate.api.model.QueryType;
 import uk.gov.gds.locate.api.validation.ValidateFormat;
 import uk.gov.gds.locate.api.validation.ValidatePostcodes;
 import uk.gov.gds.locate.api.validation.ValidateQuery;
+import uk.gov.gds.locate.api.validation.ValidateUPRN;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,10 +41,16 @@ public class AddressResource {
 
     @GET
     @Timed
-    public Response fetchAddresses(@Auth AuthorizationToken authorizationToken, @QueryParam("postcode") String postcode, @QueryParam("format") String format, @QueryParam("query") String query) throws Exception {
+    public Response fetchAddresses(@Auth AuthorizationToken authorizationToken, @QueryParam("postcode") String postcode,
+                                @QueryParam("uprn") String uprn, @QueryParam("format") String format,
+                                @QueryParam("query") String query) throws Exception {
 
-        if (!ValidatePostcodes.isValid(postcode)) {
-            throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
+        if (!ValidatePostcodes.isValid(postcode) || !ValidateUPRN.isValid(uprn)) {
+            if (! Strings.isNullOrEmpty(postcode)) {
+                throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
+            } else {
+                throw new LocateWebException(422, ImmutableMap.of("error", "uprn is invalid"));
+            }
         }
 
         if (!ValidateFormat.isValid(format)) {
@@ -54,7 +61,10 @@ public class AddressResource {
             throw new LocateWebException(422, ImmutableMap.of("error", "query is invalid"));
         }
 
-        List<Address> addresses = getAddressesFromDb(tidyPostcode(postcode));
+        if (! Strings.isNullOrEmpty(postcode)) {
+            postcode = tidyPostcode(postcode);
+        }
+        List<Address> addresses = getAddressesFromDb(postcode, uprn);
         List<Address> filtered = orderAddresses(applyPredicate(addresses, QueryType.parse(query).predicate()));
 
         if (!Strings.isNullOrEmpty(format) && format.equals(Format.VCARD.getType())) {
@@ -72,11 +82,17 @@ public class AddressResource {
         return postcode.toLowerCase().trim().replace(" ", "");
     }
 
-    private List<Address> getAddressesFromDb(String postcode) {
-        if (configuration.getEncrypted()) {
-            return decryptAddresses(addressDao.findAllForPostcode(postcode), configuration.getEncryptionKey());
+    private List<Address> getAddressesFromDb(String postcode, String uprn) {
+        List<Address> addresses = null;
+        if (! Strings.isNullOrEmpty(postcode)) {
+            addresses = addressDao.findAllForPostcode(postcode);
         } else {
-            return addressDao.findAllForPostcode(postcode);
+            addresses = addressDao.findAllForUPRN(uprn);
+        }
+        if (configuration.getEncrypted()) {
+            return decryptAddresses(addresses, configuration.getEncryptionKey());
+        } else {
+            return addresses;
         }
     }
 

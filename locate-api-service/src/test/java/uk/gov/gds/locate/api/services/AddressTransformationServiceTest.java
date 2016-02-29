@@ -24,9 +24,7 @@ import static uk.gov.gds.locate.api.services.AddressTransformationService.*;
 public class AddressTransformationServiceTest {
     private Ordering o = new OrderingBuilder().build();
     private final static SecureRandom random = new SecureRandom();
-    // private String testKey = "QWVzS2B5QmVpbmdTb21lU3RyaW5nT2ZMZW5ndGgyNTY=";
-    // private String testKey = "av45k1pfb024xa3bl359vsb4esortvks74sksr5oy4s5serondry84jsrryuhsr5ys49y5seri5shrdliheuirdygliurguiy5ru";
-    private String testKey = "av45k1pfb024xa3bl359vsb4esortvks74sksr5oy4s5serondry84jsrryuhsr5ys49y";
+    private String testKey = "QWVzS2B5QmVpbmdTb21lU3";
 
 
     private static KeyGenerator keyGenerator = null;

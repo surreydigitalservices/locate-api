@@ -23,16 +23,6 @@ public class ValidatePostcodesTest {
     }
 
     @Test
-    public void shouldDisallowNull() {
-        assertFalse(ValidatePostcodes.isValid(null));
-    }
-
-    @Test
-    public void shouldDisallowEmptyString() {
-        assertFalse(ValidatePostcodes.isValid(""));
-    }
-
-    @Test
     public void shouldDisallowTooLongText() {
         assertFalse(ValidatePostcodes.isValid("asdfghjkl1"));
     }

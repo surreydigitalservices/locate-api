@@ -41,6 +41,7 @@ public class AddressResourceTest extends ResourceTest {
     private String presentationDataFieldsToken = String.format("Bearer %s", "presentation-fields");
     private String inValidToken = String.format("Bearer %s", "bogus");
     private String validPostcode = "a11aa";
+    private String validUPRN = "10033320144";
     private String inValidPostcode = "bogus";
 
     private AuthorizationToken allFieldsAuthorizationToken = new AuthorizationToken("1", "name", "identifier", "organisation", "token");
@@ -54,6 +55,7 @@ public class AddressResourceTest extends ResourceTest {
     public void setUp() {
         when(usageDao.findUsageByIdentifier("identifier")).thenReturn(Optional.of(usage));
         when(dao.findAllForPostcode(validPostcode)).thenReturn(ImmutableList.of(address));
+        when(dao.findAllForUPRN(validUPRN)).thenReturn(ImmutableList.of(address));
         when(dao.findAllForPostcode(inValidPostcode)).thenReturn(Collections.<Address>emptyList());
         when(configuration.getMaxRequestsPerDay()).thenReturn(1);
         when(configuration.getEncryptionKey()).thenReturn("key");
@@ -184,6 +186,22 @@ public class AddressResourceTest extends ResourceTest {
         assertThat(result.get(0).getTown()).isEqualTo("town-test");
         assertThat(result.get(0).getPostcode()).isEqualTo("postcode-test");
         verify(dao, times(1)).findAllForPostcode(validPostcode);
+    }
+
+    @Test
+    public void shouldReturnAListOfAddressesForASuccessfulSearchWithUPRN() {
+        List<SimpleAddress> result = client().resource("/locate/addresses?uprn=" + validUPRN).header("Authorization", presentationDataFieldsToken).get(new GenericType<List<SimpleAddress>>() {
+        });
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getGssCode()).isEqualTo(address.getGssCode());
+        assertThat(result.get(0).getUprn()).isEqualTo(address.getUprn());
+        assertThat(result.get(0).getProperty()).isEqualTo("property-test");
+        assertThat(result.get(0).getStreet()).isEqualTo("street-test");
+        assertThat(result.get(0).getLocality()).isEqualTo("locality-test");
+        assertThat(result.get(0).getArea()).isEqualTo("area-test");
+        assertThat(result.get(0).getTown()).isEqualTo("town-test");
+        assertThat(result.get(0).getPostcode()).isEqualTo("postcode-test");
+        verify(dao, times(1)).findAllForUPRN(validUPRN);
     }
 
     @Test

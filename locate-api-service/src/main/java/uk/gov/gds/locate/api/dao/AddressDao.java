@@ -20,4 +20,9 @@ public class AddressDao {
     public List<Address> findAllForPostcode(String postcode) {
         return addresses.find().is("postcode", postcode).toArray();
     }
+
+    @Timed
+    public List<Address> findAllForUPRN(String uprn) {
+        return addresses.find().is("uprn", uprn).toArray();
+    }
 }

@@ -212,20 +212,7 @@ public class AddressResourceTest extends ResourceTest {
         List<Address> result = client().resource("/locate/addresses?format=all&usrn=" + validUSRN).header("Authorization", presentationDataFieldsToken).get(new GenericType<List<Address>>() {
         });
         assertThat(result.size()).isEqualTo(1);
-        System.out.println(result.get(0));
-        System.out.println(result.get(0).getDetails());
-        System.out.println(result.get(0).getDetails().getUsrn());
         assertThat(result.get(0).getDetails().getUsrn()).isEqualTo("usrn-test");
-
-        // assertThat(result.get(0).getGssCode()).isEqualTo(address.getGssCode());
-        // assertThat(result.get(0).getUsrn()).isEqualTo(address.getUsrn());
-        // assertThat(result.get(0).getProperty()).isEqualTo("property-test");
-        // assertThat(result.get(0).getStreet()).isEqualTo("street-test");
-        // assertThat(result.get(0).getLocality()).isEqualTo("locality-test");
-        // assertThat(result.get(0).getArea()).isEqualTo("area-test");
-        // assertThat(result.get(0).getTown()).isEqualTo("town-test");
-        // assertThat(result.get(0).getPostcode()).isEqualTo("postcode-test");
-        // verify(dao, times(1)).findAllForUSRN(validUSRN);
     }
 
     @Test

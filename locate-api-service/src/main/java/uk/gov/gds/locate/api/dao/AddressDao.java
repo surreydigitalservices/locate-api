@@ -25,4 +25,9 @@ public class AddressDao {
     public List<Address> findAllForUPRN(String uprn) {
         return addresses.find().is("uprn", uprn).toArray();
     }
+
+    @Timed
+    public List<Address> findAllForUSRN(String usrn) {
+        return addresses.find().is("detail.usrn", usrn).toArray();
+    }
 }

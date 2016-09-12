@@ -15,6 +15,7 @@ import uk.gov.gds.locate.api.validation.ValidateFormat;
 import uk.gov.gds.locate.api.validation.ValidatePostcodes;
 import uk.gov.gds.locate.api.validation.ValidateQuery;
 import uk.gov.gds.locate.api.validation.ValidateUPRN;
+import uk.gov.gds.locate.api.validation.ValidateUSRN;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,15 +42,20 @@ public class AddressResource {
 
     @GET
     @Timed
-    public Response fetchAddresses(@Auth AuthorizationToken authorizationToken, @QueryParam("postcode") String postcode,
-                                @QueryParam("uprn") String uprn, @QueryParam("format") String format,
-                                @QueryParam("query") String query) throws Exception {
+    public Response fetchAddresses( @Auth AuthorizationToken authorizationToken,
+                                    @QueryParam("postcode") String postcode,
+                                    @QueryParam("uprn") String uprn,
+                                    @QueryParam("usrn") String usrn,
+                                    @QueryParam("format") String format,
+                                    @QueryParam("query") String query) throws Exception {
 
-        if (!ValidatePostcodes.isValid(postcode) || !ValidateUPRN.isValid(uprn)) {
+        if (!ValidatePostcodes.isValid(postcode) || !ValidateUPRN.isValid(uprn) || !ValidateUSRN.isValid(usrn)) {
             if (! Strings.isNullOrEmpty(postcode)) {
                 throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
-            } else {
+            } else if (! Strings.isNullOrEmpty(uprn)) {
                 throw new LocateWebException(422, ImmutableMap.of("error", "uprn is invalid"));
+            } else {
+                throw new LocateWebException(422, ImmutableMap.of("error", "usrn is invalid"));
             }
         }
 
@@ -64,7 +70,7 @@ public class AddressResource {
         if (! Strings.isNullOrEmpty(postcode)) {
             postcode = tidyPostcode(postcode);
         }
-        List<Address> addresses = getAddressesFromDb(postcode, uprn);
+        List<Address> addresses = getAddressesFromDb(postcode, uprn, usrn);
         List<Address> filtered = orderAddresses(applyPredicate(addresses, QueryType.parse(query).predicate()));
 
         if (!Strings.isNullOrEmpty(format) && format.equals(Format.VCARD.getType())) {
@@ -82,12 +88,14 @@ public class AddressResource {
         return postcode.toLowerCase().trim().replace(" ", "");
     }
 
-    private List<Address> getAddressesFromDb(String postcode, String uprn) {
+    private List<Address> getAddressesFromDb(String postcode, String uprn, String usrn) {
         List<Address> addresses = null;
         if (! Strings.isNullOrEmpty(postcode)) {
             addresses = addressDao.findAllForPostcode(postcode);
-        } else {
+        } else if (! Strings.isNullOrEmpty(uprn)) {
             addresses = addressDao.findAllForUPRN(uprn);
+        } else {
+            addresses = addressDao.findAllForUSRN(usrn);
         }
         if (configuration.getEncrypted()) {
             return decryptAddresses(addresses, configuration.getEncryptionKey());

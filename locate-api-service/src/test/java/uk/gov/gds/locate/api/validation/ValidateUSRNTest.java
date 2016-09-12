@@ -5,21 +5,21 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ValidateUPRNTest {
+public class ValidateUSRNTest {
 
     @Test
-    public void shouldAllowValidUPRN() {
-        assertTrue(ValidateUPRN.isValid("012345678901"));
+    public void shouldAllowValidUSRN() {
+        assertTrue(ValidateUSRN.isValid("01234567"));
     }
 
     @Test
     public void shouldDisallowTooLongText() {
-        assertFalse(ValidateUPRN.isValid("0123456789012"));
+        assertFalse(ValidateUSRN.isValid("012345678"));
     }
 
     @Test
     public void shouldDisallowTextThatContansNonNumericChars() {
-        assertFalse(ValidateUPRN.isValid("a1"));
+        assertFalse(ValidateUSRN.isValid("a1"));
     }
 
 }

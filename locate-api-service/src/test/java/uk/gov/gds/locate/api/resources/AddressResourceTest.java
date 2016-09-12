@@ -42,13 +42,15 @@ public class AddressResourceTest extends ResourceTest {
     private String inValidToken = String.format("Bearer %s", "bogus");
     private String validPostcode = "a11aa";
     private String validUPRN = "10033320144";
+    private String validUSRN = "12345678";
     private String inValidPostcode = "bogus";
 
     private AuthorizationToken allFieldsAuthorizationToken = new AuthorizationToken("1", "name", "identifier", "organisation", "token");
     private AuthorizationToken presentationFieldsAuthorizationToken = new AuthorizationToken("1", "name", "identifier", "organisation", "token");
-    private Details validAddress = new DetailsBuilder("test").postal(true).residential(true).electoral(true).build();
+    private Presentation presentation = new PresentationBuilder("test").build();
+    private Details details = new DetailsBuilder("test").postal(true).residential(true).electoral(true).build();
     private Ordering ordering = new OrderingBuilder().build();
-    private Address address = new Address("gssCode", "uprn", "postcode", "country", new Date(), new PresentationBuilder("test").build(), validAddress, new Location(), ordering, "iv");
+    private Address address = new Address("gssCode", "uprn", "postcode", "country", new Date(), presentation, details, new Location(), ordering, "iv");
     private Usage usage = new Usage("id", "identifier", 1, new Date());
 
     @Before
@@ -56,6 +58,7 @@ public class AddressResourceTest extends ResourceTest {
         when(usageDao.findUsageByIdentifier("identifier")).thenReturn(Optional.of(usage));
         when(dao.findAllForPostcode(validPostcode)).thenReturn(ImmutableList.of(address));
         when(dao.findAllForUPRN(validUPRN)).thenReturn(ImmutableList.of(address));
+        when(dao.findAllForUSRN(validUSRN)).thenReturn(ImmutableList.of(address));
         when(dao.findAllForPostcode(inValidPostcode)).thenReturn(Collections.<Address>emptyList());
         when(configuration.getMaxRequestsPerDay()).thenReturn(1);
         when(configuration.getEncryptionKey()).thenReturn("key");
@@ -205,6 +208,27 @@ public class AddressResourceTest extends ResourceTest {
     }
 
     @Test
+    public void shouldReturnAListOfAddressesForASuccessfulSearchWithUSRN() {
+        List<Address> result = client().resource("/locate/addresses?format=all&usrn=" + validUSRN).header("Authorization", presentationDataFieldsToken).get(new GenericType<List<Address>>() {
+        });
+        assertThat(result.size()).isEqualTo(1);
+        System.out.println(result.get(0));
+        System.out.println(result.get(0).getDetails());
+        System.out.println(result.get(0).getDetails().getUsrn());
+        assertThat(result.get(0).getDetails().getUsrn()).isEqualTo("usrn-test");
+
+        // assertThat(result.get(0).getGssCode()).isEqualTo(address.getGssCode());
+        // assertThat(result.get(0).getUsrn()).isEqualTo(address.getUsrn());
+        // assertThat(result.get(0).getProperty()).isEqualTo("property-test");
+        // assertThat(result.get(0).getStreet()).isEqualTo("street-test");
+        // assertThat(result.get(0).getLocality()).isEqualTo("locality-test");
+        // assertThat(result.get(0).getArea()).isEqualTo("area-test");
+        // assertThat(result.get(0).getTown()).isEqualTo("town-test");
+        // assertThat(result.get(0).getPostcode()).isEqualTo("postcode-test");
+        // verify(dao, times(1)).findAllForUSRN(validUSRN);
+    }
+
+    @Test
     public void shouldReturnAListOfAddressesForASuccessfulSearchWithPresentationFormatQuery() {
         List<SimpleAddress> result = client().resource("/locate/addresses?format=presentation&postcode=" + validPostcode).header("Authorization", presentationDataFieldsToken).get(new GenericType<List<SimpleAddress>>() {
         });
@@ -254,7 +278,7 @@ public class AddressResourceTest extends ResourceTest {
     public void shouldReturnAListOfAddressesWithoutNullFieldsAsValidJSONForASuccessfulSearch() {
         Presentation presentation = new Presentation();
 
-        Address addressWithMissingFields = new Address("gssCode", "uprn", null, "country", new Date(), presentation, validAddress, new Location(), new Ordering(), "iv");
+        Address addressWithMissingFields = new Address("gssCode", "uprn", null, "country", new Date(), presentation, details, new Location(), new Ordering(), "iv");
         when(dao.findAllForPostcode(validPostcode)).thenReturn(ImmutableList.of(addressWithMissingFields));
 
         String result = client().resource("/locate/addresses?postcode=" + validPostcode).header("Authorization", allDataFieldsToken).get(String.class);

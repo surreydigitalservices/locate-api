@@ -49,6 +49,9 @@ public class Details {
     @JsonProperty("secondaryClassification")
     private String secondaryClassification;
 
+    @JsonProperty("custodian")
+    private String custodian;
+
     public Details() {
     }
 
@@ -64,7 +67,8 @@ public class Details {
                    String usrn,
                    String file,
                    String primaryClassification,
-                   String secondaryClassification) {
+                   String secondaryClassification,
+                   String custodian) {
 
         this.blpuCreatedAt = blpuCreatedAt;
         this.blpuUpdatedAt = blpuUpdatedAt;
@@ -79,6 +83,7 @@ public class Details {
         this.file = file;
         this.primaryClassification = primaryClassification;
         this.secondaryClassification = secondaryClassification;
+        this.custodian = custodian;
     }
 
     public Date getBlpuCreatedAt() {
@@ -133,6 +138,10 @@ public class Details {
         return secondaryClassification;
     }
 
+    public String getCustodian() {
+        return custodian;
+    }
+
     @Override
     public String toString() {
         return "Details{" +
@@ -149,6 +158,7 @@ public class Details {
                 ", file='" + file + '\'' +
                 ", primaryClassification='" + primaryClassification + '\'' +
                 ", secondaryClassification='" + secondaryClassification + '\'' +
+                ", custodian='" + custodian + '\'' +
                 '}';
     }
 }

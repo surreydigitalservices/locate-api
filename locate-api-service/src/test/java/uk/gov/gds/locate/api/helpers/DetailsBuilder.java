@@ -18,6 +18,7 @@ public class DetailsBuilder {
     private String file;
     private String primaryClassification;
     private String secondaryClassification;
+    private String custodian;
 
     public DetailsBuilder(String suffix) {
         isPostalAddress = false;
@@ -33,6 +34,7 @@ public class DetailsBuilder {
         file = "file-" + suffix;
         primaryClassification = "primaryClassification-" + suffix;
         secondaryClassification = "secondaryClassification-" + suffix;
+        custodian = "custodian-" + suffix;
     }
 
     public DetailsBuilder postal(Boolean isPostalAddress) {
@@ -61,6 +63,6 @@ public class DetailsBuilder {
     }
 
     public Details build() {
-        return new Details(blpuCreatedAt, blpuUpdatedAt, classification, state, isPostalAddress, isCommercial, isResidential, isHigherEducational, isElectoral, usrn, file, primaryClassification, secondaryClassification);
+        return new Details(blpuCreatedAt, blpuUpdatedAt, classification, state, isPostalAddress, isCommercial, isResidential, isHigherEducational, isElectoral, usrn, file, primaryClassification, secondaryClassification, custodian);
     }
 }

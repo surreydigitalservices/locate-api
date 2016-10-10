@@ -26,6 +26,13 @@ public class Location {
         this.northing = northing;
     }
 
+    public Location(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.easting = null;
+        this.northing = null;
+    }
+
     public Double getLatitude() {
         return latitude;
     }

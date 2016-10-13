@@ -1,5 +1,6 @@
 package uk.gov.gds.locate.api.resources;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.yammer.dropwizard.auth.Auth;
 import com.yammer.metrics.annotation.Timed;
@@ -32,8 +33,16 @@ public class PostcodeToAuthorityResource {
         if (!ValidatePostcodes.isValid(postcode)) {
             throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
         }
+        if (! Strings.isNullOrEmpty(postcode)) {
+            postcode = tidyPostcode(postcode);
+        }
+
         PostcodeToAuthority postcodeToAuthority = dao.findForPostcode(postcode);
         if(postcodeToAuthority == null) throw new ResourceNotFoundException();
         return postcodeToAuthority;
+    }
+
+    private String tidyPostcode(String postcode) {
+        return postcode.toLowerCase().trim().replace(" ", "");
     }
 }

@@ -54,22 +54,22 @@ public class AddressResource {
                 throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
             } else if (! Strings.isNullOrEmpty(uprn)) {
                 throw new LocateWebException(422, ImmutableMap.of("error", "uprn is invalid"));
-            } else {
+            } else if (! Strings.isNullOrEmpty(usrn)) {
                 throw new LocateWebException(422, ImmutableMap.of("error", "usrn is invalid"));
+            } else {
+                throw new LocateWebException(422, ImmutableMap.of("error", "a query parameter (postcode, uprn, usrn) is needed"));
             }
         }
-
         if (!ValidateFormat.isValid(format)) {
             throw new LocateWebException(422, ImmutableMap.of("error", "format is invalid"));
         }
-
         if (!ValidateQuery.isValid(query)) {
             throw new LocateWebException(422, ImmutableMap.of("error", "query is invalid"));
         }
-
         if (! Strings.isNullOrEmpty(postcode)) {
             postcode = tidyPostcode(postcode);
         }
+
         List<Address> addresses = getAddressesFromDb(postcode, uprn, usrn);
         List<Address> filtered = orderAddresses(applyPredicate(addresses, QueryType.parse(query).predicate()));
 

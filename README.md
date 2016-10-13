@@ -13,11 +13,15 @@ Full details of the source data are contained in the importer project, in the do
 
 ## Usage
 
+### Swagger API documentation
+
+See `docs/swagger.yml` for Swagger documentation of the API. This can be imported into http://editor.swagger.io/#/.
+
 ### Authorization
 
 The API uses Bearer token Authorization headers for access control.
 
-    curl -H"Authorization: Bearer my_token" https://url-to-api/locate/addresses?postcode=sw11er 
+    curl -H"Authorization: Bearer my_token" https://url-to-api/locate/addresses?postcode=sw11er
 
 These tokens must relate to an entry in a collection entitled authorizationToken. The details of this collection are:
 
@@ -47,18 +51,18 @@ All fields are required.
 The first use case is address lookups. The basic call (curl example):
 
     curl -H"Authorization: Bearer credentials" https://host/locate/addresses?postcode=kt70tj
-    
+
 Query parameters:
 
     postcode=a11aa
     format=vcard [optional|spike] vcard is the only option here and overrides the data type described below. Spike in lieu of addressing standards.
-    
+
 ### Queries
 
 The following fields in the authorization collection determine the query associated with this toke:
 
     * queryType: this restricts the results.
-    
+
     * dataType: this restricts the JSON fields in the response.
 
 ### Query Type
@@ -66,17 +70,17 @@ The following fields in the authorization collection determine the query associa
 These are the predetermined queries the API will support. These are defined in the authorization collection.
 
     * residential: Returns only residential properties.
-    
+
     * commercial: Returns only commercial properties.
-    
+
     * residentialAndCommercial: Returns the combination of residential and commercial queries.
-   
+
     * electoral: Returns properties that are deemed residential for the purposes of registering to vote, residential above plus some educational, hospital etc addresses in which people may reside.
-    
+
     * all: Returns an unfiltered view of the address database.
-    
-The data to enable this is derived from classification codes that each record has, these can be found in the documentation section of the importer project. https://github.com/alphagov/location-data-importer/blob/master/docs/address-base/addressbase-products-classification-codes.pdf    
-    
+
+The data to enable this is derived from classification codes that each record has, these can be found in the documentation section of the importer project. https://github.com/alphagov/location-data-importer/blob/master/docs/address-base/addressbase-products-classification-codes.pdf
+
     * residential: are all addresses with codes beginning
         - R (generic residential)
         - RH (multiple occupancy)
@@ -91,13 +95,13 @@ The data to enable this is derived from classification codes that each record ha
         - CE01 (college)
         - CE05 (univeristy)
     * all: no filtering
-    
+
 ### Data Type
 
-This controls the amount of data returned for each address. 
+This controls the amount of data returned for each address.
 
 * Presentation: This returns the minimum data set for an address. Suitable for most web based applications.
-    
+
         {
             "property": "Flat A",
             "street": "93 Latchmere Road",
@@ -108,7 +112,7 @@ This controls the amount of data returned for each address.
             "uprn": "10090499727",
             "gssCode": "E09000032"
         }
-    
+
         - property: Contains lowest granularity, flat numbers, house names and so on
         - street: Street number plus street name
         - locality: Area within a post town
@@ -119,7 +123,7 @@ This controls the amount of data returned for each address.
         - gssCode: Government Statistical Service code for the Local Authority this address resides in.
 
 * All: The returns the full data set for an address. In most use cases the presentation object will be sufficient.
-        
+
         {
             "gssCode": "E09000032",
             "country": "England",
@@ -172,7 +176,7 @@ This controls the amount of data returned for each address.
         }
 
     The fields here confirm to the vCard adr field.
-    
+
     * extended-address is the property field from the presentation block above
     * street-address is the street field from the presentation block above
     * locality is the town from the presentation block above
@@ -202,15 +206,15 @@ curl -H"Authorization: Bearer credentials" https://host/locate/authority?postcod
             "ward" : "S13002483"
         }
 
-*   country: Derived from ONS codes: 
+*   country: Derived from ONS codes:
     England     Scotland    Wales       N Ireland
     E92000001   S92000003   W92000004   N92000002
-    
+
 *   gssCode: Unitary Authority, Metropolitan and Non- Metropolitan District, London Borough or Scottish Council Area in which postcode falls.
 
 *   easting/northing/lat/long: location of CPLC. CPLC is the location indicator for this code point. This is a point within the postcode area that is nearest the mean position of
  postal addresses. Not geographical central point.
- 
+
 *   nhsRegionalHealthAuthority: English Pan Strategic Health Authority in which CPLC falls. [optional]
 
 *   nhsHealthAuthority: English Strategic Health Authority or Scottish Health Board in which CPLC falls. [optional]
@@ -233,7 +237,7 @@ Details of the authority data and it's accuracy are available in the OS document
 Run the dropwizard mongo-index task to index the database:
 
     curl -X POST http://host/tasks/mongo-index
-    
+
 This indexes the auth collections. The address indexes are applied during import.
 
 ## Rate Limiting
@@ -244,21 +248,23 @@ Every successful auth increments a usage count document for that identifier, and
 
 The limit is configured in the yaml file, default 1000.
 
-## SetUp
+## Setup
 
-### Prerequisites 
+### Prerequisites
+
 * MongoDB: The locate API utilises mongo as it's datastore.
 
 * Data: The datastore must contain an addresses database. This can be built from: https://github.com/alphagov/location-data-importer
 
 ### Running
 
-* There are scripts in the root of the project:
-    
-       * ./run-api.sh - will start the API.
-       
-       * ./run-debug-api.sh - will start the API in debug mode.
+Run `make run`.
 
+* There are scripts in the root of the project:
+
+       * ./run-api.sh - will start the API.
+
+       * ./run-debug-api.sh - will start the API in debug mode.
 
 #### Heroku
 
@@ -272,8 +278,15 @@ The following environment properties must be set for the application to work in 
         heroku config:set MONGO_USER=
         heroku config:set MONGO_PASSWORD=
         heroku config:set ALLOWED_ORIGINS=
-     
- 
+
+
+## Testing
+
+Run:
+
+`make test`
+
+
 ### License
 Issued under MIT (see LICENSE)
 

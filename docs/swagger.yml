@@ -1,0 +1,156 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: Address API
+  description: Address lookup service.
+  version: "1.0.0"
+# the domain of the service
+host: address.digitalservices.surreyi.gov.uk
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+produces:
+  - application/json
+paths:
+  /locate/addresses:
+    get:
+      summary: Addresses
+      description: |
+        The addresses endpoint returns information about addresses across the UK.
+      parameters:
+        - name: postcode
+          in: query
+          description: A postcode.
+          required: false
+          type: string
+        - name: uprn
+          in: query
+          description: A UPRN number for a single property.
+          required: false
+          type: string
+        - name: usrn
+          in: query
+          description: A USRN number for a street.
+          required: false
+          type: string
+        - name: query
+          in: query
+          description: The type of query, whether residential, commercial, electoral.
+          required: false
+          type: string
+        - name: format
+          in: query
+          description: The format of the returned data, either presentation, all or vcard.
+          required: false
+          type: string
+      tags:
+        - addresses
+      responses:
+        200:
+          description: An array of addresses
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Address'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /locate/authority:
+    get:
+      summary: Postcode authority information
+      description: |
+        The authority endpoint returns the basic statistical geography for a postcode.
+      parameters:
+        - name: postcode
+          in: query
+          description: A postcode.
+          required: true
+          type: string
+      responses:
+        200:
+          description: The geography information for the postcode.
+          schema:
+            $ref: '#/definitions/Geography'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Address:
+    type: object
+    properties:
+      property:
+        type: string
+        description: Contains lowest granularity, flat numbers, house names and so on.
+      street:
+        type: string
+        description: Street number plus street name.
+      locality:
+        type: string
+        description: Area within a post town.
+      town:
+        type: string
+        description: Town or city.
+      area:
+        type: string
+        description: Administrative area.
+      postcode:
+        type: string
+        description: Postcode, formatted for display.
+      uprn:
+        type: integer
+        format: int64
+        description: Universal Property Reference Number
+      gssCode:
+        type: string
+        description: Government Statistical Service code for the Local Authority this address resides in.
+  Geography:
+    type: object
+    properties:
+      postcode:
+        type: string
+        description: Postcode.
+      country:
+        type: string
+        description: "Derived from ONS codes: England Scotland Wales N Ireland E92000001 S92000003 W92000004 N92000002"
+      gssCode:
+        type: string
+        description: Unitary Authority, Metropolitan and Non-metropolitan District, London Borough or Scottish Council Area in which postcode falls.
+      name:
+        type: string
+        description: Name.
+      easting:
+        type: string
+        description: Location of CPLC.
+      northing:
+        type: string
+        description: Location of CPLC.
+      lat:
+        type: string
+        description: Location of CPLC.
+      long:
+        type: string
+        description: Location of CPLC.
+      nhsRegionalHealthAuthority:
+        type: string
+        description: English Pan Strategic Health Authority in which CPLC falls.
+      nhsHealthAuthority:
+        type: string
+        description: English Strategic Health Authority or Scottish Health Board in which CPLC falls.
+      county:
+        type: string
+        description: County in which CPLC falls.
+      ward:
+        type: string
+        description: Electoral Ward or Division in which CPLC falls.
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

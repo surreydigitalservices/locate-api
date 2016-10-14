@@ -49,7 +49,10 @@ public class AddressResource {
                                     @QueryParam("format") String format,
                                     @QueryParam("query") String query) throws Exception {
 
-        if (!ValidatePostcodes.isValid(postcode) || !ValidateUPRN.isValid(uprn) || !ValidateUSRN.isValid(usrn)) {
+        if (Strings.isNullOrEmpty(postcode) && Strings.isNullOrEmpty(uprn) && Strings.isNullOrEmpty(usrn)) {
+            throw new LocateWebException(422, ImmutableMap.of("error", "a query parameter (postcode, uprn, usrn) is needed"));
+        }
+        if (! ValidatePostcodes.isValid(postcode) || ! ValidateUPRN.isValid(uprn) || ! ValidateUSRN.isValid(usrn)) {
             if (! Strings.isNullOrEmpty(postcode)) {
                 throw new LocateWebException(422, ImmutableMap.of("error", "postcode is invalid"));
             } else if (! Strings.isNullOrEmpty(uprn)) {

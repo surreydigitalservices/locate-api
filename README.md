@@ -1,11 +1,11 @@
 [![Build Status](https://travis-ci.org/surreydigitalservices/locate-api.svg?branch=master)](https://travis-ci.org/surreydigitalservices/locate-api)
 
-Locate Api
+Locate API
 ==========
 
-The Locate API is a simple API to enable access to a Mongo database containing UK address information.
+The Locate API is a simple API to enable access to a MongoDB database containing UK address information.
 
-This service is built on the top of AddressBase premium, an Ordinance Survey data product, available to the public sector under the terms of the PSMA.
+This service is built on the top of AddressBase Premium, an Ordinance Survey data product, available to the public sector under the terms of the PSMA.
 
 The importer project, https://github.com/alphagov/location-data-importer , transforms this data into a mongo database, which underpins the services described below.
 
@@ -46,7 +46,7 @@ All fields are required.
     * queryType: see below for outline.
     * dataType: see below for outline.
 
-### Address Lookups
+### Address lookups
 
 The first use case is address lookups. The basic call (curl example):
 
@@ -59,13 +59,13 @@ Query parameters:
 
 ### Queries
 
-The following fields in the authorization collection determine the query associated with this toke:
+The following fields in the authorization collection determine the query associated with this token:
 
     * queryType: this restricts the results.
 
     * dataType: this restricts the JSON fields in the response.
 
-### Query Type
+### Query type
 
 These are the predetermined queries the API will support. These are defined in the authorization collection.
 
@@ -96,11 +96,13 @@ The data to enable this is derived from classification codes that each record ha
         - CE05 (univeristy)
     * all: no filtering
 
-### Data Type
+### Data type
 
 This controls the amount of data returned for each address.
 
-* Presentation: This returns the minimum data set for an address. Suitable for most web based applications.
+#### Presentation
+
+This returns the minimum data set for an address. Suitable for most web based applications.
 
         {
             "property": "Flat A",
@@ -122,7 +124,9 @@ This controls the amount of data returned for each address.
         - uprn: Unique Property Reference Number
         - gssCode: Government Statistical Service code for the Local Authority this address resides in.
 
-* All: The returns the full data set for an address. In most use cases the presentation object will be sufficient.
+#### All
+
+The returns the full data set for an address. In most use cases the presentation object will be sufficient.
 
         {
             "gssCode": "E09000032",
@@ -162,7 +166,9 @@ This controls the amount of data returned for each address.
             }
         }
 
-* Vcard. Using the query parameter format, and the value vcard will return the following structure - overriding the above.
+#### Vcard
+
+Using the query parameter format, and the value vcard will return the following structure - overriding the above.
 
         {
             "extended-address":"1 Sovereign Place",
@@ -185,7 +191,7 @@ This controls the amount of data returned for each address.
     * x-uprn as above, extension to vcard to allow for URPN
     * vcard is a convience that formats the rest of the fields as a vcard compatible string.
 
-### Authority Lookups
+### Authority lookups
 
 This API call returnes the basic statistical geography for a postcode.
 
@@ -206,27 +212,27 @@ curl -H"Authorization: Bearer credentials" https://host/locate/authority?postcod
             "ward" : "S13002483"
         }
 
-*   country: Derived from ONS codes:
+*   `country`: Derived from ONS codes:
     England     Scotland    Wales       N Ireland
     E92000001   S92000003   W92000004   N92000002
 
-*   gssCode: Unitary Authority, Metropolitan and Non- Metropolitan District, London Borough or Scottish Council Area in which postcode falls.
+*   `gssCode`: Unitary Authority, Metropolitan and Non- Metropolitan District, London Borough or Scottish Council Area in which postcode falls.
 
-*   easting/northing/lat/long: location of CPLC. CPLC is the location indicator for this code point. This is a point within the postcode area that is nearest the mean position of
+*   `easting`/`northing`/`lat`/`long`: location of CPLC. CPLC is the location indicator for this code point. This is a point within the postcode area that is nearest the mean position of
  postal addresses. Not geographical central point.
 
-*   nhsRegionalHealthAuthority: English Pan Strategic Health Authority in which CPLC falls. [optional]
+*   `nhsRegionalHealthAuthority`: English Pan Strategic Health Authority in which CPLC falls. [optional]
 
-*   nhsHealthAuthority: English Strategic Health Authority or Scottish Health Board in which CPLC falls. [optional]
+*   `nhsHealthAuthority`: English Strategic Health Authority or Scottish Health Board in which CPLC falls. [optional]
 
-*   county: County in which CPLC falls. [optional]
+*   `county`: County in which CPLC falls. [optional]
 
-*   ward: Electoral Ward or Division in which CPLC falls. [optional]
+*   `ward`: Electoral Ward or Division in which CPLC falls. [optional]
 
 ### Granularity
 
 Properties have a 1 to 1 mapping to statistical geographies. However the same does not hold true for postcodes. The address API call maps the properties to the
-gssCode at a property level. This ensures that when a postcode crosses a boundary the properties are correctly associated with either side of the boundary.
+`gssCode` at a property level. This ensures that when a postcode crosses a boundary the properties are correctly associated with either side of the boundary.
 
 As the authority lookup is only on a per postcode basis this level of accuracy is not available.
 
@@ -240,11 +246,11 @@ Run the dropwizard mongo-index task to index the database:
 
 This indexes the auth collections. The address indexes are applied during import.
 
-## Rate Limiting
+## Rate limiting
 
 This API has very simple rate limiting. It utilises mongo TTL indexes and a collection entitled usage,
 
-Every successful auth increments a usage count document for that identifier, and these are removed by mongod at midnight every night.
+Every successful auth increments a usage count document for that identifier, and these are removed by `mongod` at midnight every night.
 
 The limit is configured in the yaml file, default 1000.
 
@@ -262,9 +268,9 @@ Run `make run`.
 
 * There are scripts in the root of the project:
 
-       * ./run-api.sh - will start the API.
+       * `./run-api.sh` - will start the API.
 
-       * ./run-debug-api.sh - will start the API in debug mode.
+       * `./run-debug-api.sh` - will start the API in debug mode.
 
 #### Heroku
 

@@ -43,7 +43,7 @@ public class AddressResourceTest extends ResourceTest {
     private String validPostcode = "a11aa";
     private String validUPRN = "10033320144";
     private String validUSRN = "12345678";
-    private String inValidPostcode = "bogus";
+    private String inValidPostcode = "zz99zz";
 
     private AuthorizationToken allFieldsAuthorizationToken = new AuthorizationToken("1", "name", "identifier", "organisation", "token");
     private AuthorizationToken presentationFieldsAuthorizationToken = new AuthorizationToken("1", "name", "identifier", "organisation", "token");

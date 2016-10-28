@@ -24,6 +24,7 @@ public class PostcodeToAuthorityResourceTest extends ResourceTest {
     private AuthorizationToken valid = new AuthorizationToken("1", "name", "identifier", "organisation", "token");
     private String validToken = String.format("Bearer %s", "token");
     private String inValidToken = String.format("Bearer %s", "bogus");
+    private String inValidPostcode = "zz99zz";
 
     private Usage usage = new Usage("id", "identifier", 1, new Date());
 
@@ -99,9 +100,9 @@ public class PostcodeToAuthorityResourceTest extends ResourceTest {
 
     @Test
     public void shouldReturn404IfNotFound() {
-        when(dao.findForPostcode("postcode")).thenReturn(null);
+        when(dao.findForPostcode("AA1 1AA")).thenReturn(null);
         try {
-            client().resource("/locate/authority?postcode=postcode").header("Authorization", validToken).get(Object.class);
+            client().resource("/locate/authority?postcode=" + inValidPostcode).header("Authorization", validToken).get(Object.class);
             fail("Fail should have been a validation error");
         } catch (UniformInterfaceException e) {
             assertThat(e.getResponse().getStatus()).isEqualTo(404);

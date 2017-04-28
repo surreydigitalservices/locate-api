@@ -132,7 +132,7 @@ The returns the full data set for an address. In most use cases the presentation
             "gssCode": "E09000032",
             "country": "England",
             "postcode": "sw112dr",
-            uprn": "100023586417",
+            "uprn": "100023586417",
             "createdAt": "2014-07-03",
             "presentation": {
                 "property": "Arches 11 And 12",
